@@ -6,6 +6,68 @@ import { Cloud, Thermometer, Droplets, Wind, Eye, Gauge } from 'lucide-react';
 const algeriaCenter = [28.0339, 1.6596];
 const API_KEY = 'df49157699629ac08a45a675a5c7c1e2';
 
+// All 58 Wilayas (provinces) of Algeria
+const algeriaWilayas = [
+  { name: 'Adrar', position: [27.8742, -0.2936], code: '01' },
+  { name: 'Chlef', position: [36.1654, 1.3347], code: '02' },
+  { name: 'Laghouat', position: [33.8008, 2.8648], code: '03' },
+  { name: 'Oum El Bouaghi', position: [35.8753, 7.1138], code: '04' },
+  { name: 'Batna', position: [35.5559, 6.1741], code: '05' },
+  { name: 'Béjaïa', position: [36.7594, 5.0689], code: '06' },
+  { name: 'Biskra', position: [34.8481, 5.7281], code: '07' },
+  { name: 'Béchar', position: [31.6177, -2.2258], code: '08' },
+  { name: 'Blida', position: [36.4203, 2.8277], code: '09' },
+  { name: 'Bouira', position: [36.3739, 3.9000], code: '10' },
+  { name: 'Tamanrasset', position: [22.7851, 5.5228], code: '11' },
+  { name: 'Tébessa', position: [35.4075, 8.1244], code: '12' },
+  { name: 'Tlemcen', position: [34.8789, -1.3150], code: '13' },
+  { name: 'Tiaret', position: [35.3712, 1.3170], code: '14' },
+  { name: 'Tizi Ouzou', position: [36.7118, 4.0435], code: '15' },
+  { name: 'Algiers', position: [36.7538, 3.0588], code: '16' },
+  { name: 'Djelfa', position: [34.6792, 3.2631], code: '17' },
+  { name: 'Jijel', position: [36.8190, 5.7669], code: '18' },
+  { name: 'Sétif', position: [36.1906, 5.4106], code: '19' },
+  { name: 'Saïda', position: [34.8306, 0.1514], code: '20' },
+  { name: 'Skikda', position: [36.8761, 6.9094], code: '21' },
+  { name: 'Sidi Bel Abbès', position: [35.1878, -0.6308], code: '22' },
+  { name: 'Annaba', position: [36.9000, 7.7667], code: '23' },
+  { name: 'Guelma', position: [36.4615, 7.4281], code: '24' },
+  { name: 'Constantine', position: [36.3650, 6.6147], code: '25' },
+  { name: 'Médéa', position: [36.2686, 2.7531], code: '26' },
+  { name: 'Mostaganem', position: [35.9315, 0.0892], code: '27' },
+  { name: 'M\'Sila', position: [35.7017, 4.5413], code: '28' },
+  { name: 'Mascara', position: [35.3964, 0.1406], code: '29' },
+  { name: 'Ouargla', position: [31.9465, 5.3317], code: '30' },
+  { name: 'Oran', position: [35.6976, -0.6337], code: '31' },
+  { name: 'El Bayadh', position: [33.6806, 1.0194], code: '32' },
+  { name: 'Illizi', position: [26.4833, 8.4667], code: '33' },
+  { name: 'Bordj Bou Arréridj', position: [36.0731, 4.7608], code: '34' },
+  { name: 'Boumerdès', position: [36.7667, 3.4833], code: '35' },
+  { name: 'El Tarf', position: [36.7672, 8.3136], code: '36' },
+  { name: 'Tindouf', position: [27.6700, -8.1475], code: '37' },
+  { name: 'Tissemsilt', position: [35.6069, 1.8114], code: '38' },
+  { name: 'El Oued', position: [33.3561, 6.8675], code: '39' },
+  { name: 'Khenchela', position: [35.4361, 7.1436], code: '40' },
+  { name: 'Souk Ahras', position: [36.2866, 7.9506], code: '41' },
+  { name: 'Tipaza', position: [36.5944, 2.4467], code: '42' },
+  { name: 'Mila', position: [36.4503, 6.2650], code: '43' },
+  { name: 'Aïn Defla', position: [36.2639, 1.9681], code: '44' },
+  { name: 'Naâma', position: [33.2667, -0.3000], code: '45' },
+  { name: 'Aïn Témouchent', position: [35.2981, -1.1406], code: '46' },
+  { name: 'Ghardaïa', position: [32.4911, 3.6736], code: '47' },
+  { name: 'Relizane', position: [35.7369, 0.5561], code: '48' },
+  { name: 'Timimoun', position: [29.2631, 0.2411], code: '49' },
+  { name: 'Bordj Badji Mokhtar', position: [21.3281, 0.9256], code: '50' },
+  { name: 'Ouled Djellal', position: [34.4167, 5.1000], code: '51' },
+  { name: 'Béni Abbès', position: [30.1306, -2.1667], code: '52' },
+  { name: 'In Salah', position: [27.2167, 2.4833], code: '53' },
+  { name: 'In Guezzam', position: [19.5667, 5.7667], code: '54' },
+  { name: 'Touggourt', position: [33.1069, 6.0581], code: '55' },
+  { name: 'Djanet', position: [24.5544, 9.4841], code: '56' },
+  { name: 'El M\'Ghair', position: [33.9500, 5.9167], code: '57' },
+  { name: 'El Menia', position: [30.5833, 2.8833], code: '58' }
+];
+
 const styles = {
   container: {
     display: 'flex',
@@ -108,6 +170,13 @@ const styles = {
     overflow: 'hidden',
     border: '1px solid #e5e7eb',
     boxShadow: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)'
+  },
+  wilayaCount: {
+    fontSize: '12px',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginTop: '8px',
+    opacity: 0.8
   }
 };
 
@@ -258,6 +327,7 @@ const WeatherMap = () => {
               </button>
             ))}
           </div>
+          
         </div>
       </div>
 
@@ -277,7 +347,7 @@ const WeatherMap = () => {
             <MapContainer
               center={algeriaCenter}
               zoom={6}
-              style={{ height: '400px', width: '100%' }}
+              style={{ height: '500px', width: '100%' }}
               scrollWheelZoom={true}
             >
               <TileLayer
@@ -293,31 +363,37 @@ const WeatherMap = () => {
                 />
               )}
               
-              <Marker position={algeriaCenter}>
-                <Popup>
-                  <div style={{ padding: '8px', color: '#000000' }}>
-                    <h3 style={{ 
-                      fontWeight: 'bold', 
-                      fontSize: '18px', 
-                      marginBottom: '8px', 
-                      color: '#000000' 
-                    }}>
-                      Algeria (Center)
-                    </h3>
-                    <div style={{ 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '4px', 
-                      fontSize: '14px', 
-                      color: '#000000' 
-                    }}>
-                      <p style={{ color: '#000000', margin: 0 }}>
-                        Weather layer: {activeLayerData?.name}
-                      </p>
+              {algeriaWilayas.map((wilaya, index) => (
+                <Marker key={index} position={wilaya.position}>
+                  <Popup>
+                    <div style={{ padding: '8px', color: '#000000' }}>
+                      <h3 style={{ 
+                        fontWeight: 'bold', 
+                        fontSize: '18px', 
+                        marginBottom: '8px', 
+                        color: '#000000' 
+                      }}>
+                        {wilaya.name}
+                      </h3>
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: '4px', 
+                        fontSize: '14px', 
+                        color: '#000000' 
+                      }}>
+                        <p style={{ color: '#000000', margin: 0 }}>
+                          Wilaya Number: {wilaya.code}
+                        </p>
+                        <p style={{ color: '#000000', margin: 0 }}>
+                          Weather layer: {activeLayerData?.name}
+                        </p>
+                        
+                      </div>
                     </div>
-                  </div>
-                </Popup>
-              </Marker>
+                  </Popup>
+                </Marker>
+              ))}
             </MapContainer>
           </div>
         </div>
