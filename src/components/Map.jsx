@@ -72,15 +72,17 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'end',
     justifyContent: 'flex-start',
     maxWidthHeight: '100vh',
     padding: '0px',
-    marginLeft: '0px'
+    marginRight: '15px',
+  
+
   },
   contentWrapper: {
     width: '100%',
-    maxWidth: '800px',
+     maxWidth:'950px',
     marginBottom: '13px',
     marginLeft: '100px'
   },
@@ -97,7 +99,7 @@ const styles = {
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     padding: '24px',
     marginBottom: '24px',
-    minHeight: '120px'
+    minHeight: '120px',
   },
   layerTitle: {
     fontSize: '18px',
@@ -134,7 +136,7 @@ const styles = {
   },
   mapWrapper: {
     width: '100%',
-    maxWidth: '900px',
+    maxWidth: '1050px',
   },
   mapContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',

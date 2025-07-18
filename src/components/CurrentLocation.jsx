@@ -3,68 +3,115 @@ import { Cloud, Droplets, Wind, Eye, Thermometer, Gauge, Sunrise, Sunset, Naviga
 
 const API_KEY = "df49157699629ac08a45a675a5c7c1e2";
 
+// Enhanced weather icon mapping with comprehensive conditions
 const weatherIconMap = {
   // Clear conditions
   Clear: "☀️",
+  "clear sky": "☀️",
   
   // Cloud conditions
   Clouds: "☁️",
-  "Partly Cloudy": "⛅",
-  "Scattered Clouds": "🌤️",
-  "Broken Clouds": "☁️",
-  "Overcast": "☁️",
-  
-  // Wind conditions
-  "Windy": "🌬️",
-  "Breezy": "🌬️",
+  "few clouds": "⛅",
+  "scattered clouds": "🌤️",
+  "broken clouds": "☁️",
+  "overcast clouds": "☁️",
   
   // Rain conditions
   Rain: "🌧️",
   Drizzle: "🌦️",
-  "Light Rain": "🌦️",
-  "Moderate Rain": "🌧️",
-  "Heavy Rain": "🌧️",
-  "Shower Rain": "🌧️",
+  "light rain": "🌦️",
+  "moderate rain": "🌧️",
+  "heavy intensity rain": "🌧️",
+  "very heavy rain": "🌧️",
+  "extreme rain": "🌧️",
+  "shower rain": "🌧️",
+  "light intensity shower rain": "🌧️",
+  "heavy intensity shower rain": "🌧️",
+  "ragged shower rain": "🌧️",
   
   // Storm conditions
   Thunderstorm: "⛈️",
-  "Thunderstorm with Light Rain": "⛈️",
-  "Thunderstorm with Rain": "⛈️",
-  "Thunderstorm with Heavy Rain": "⛈️",
-  "Light Thunderstorm": "⛈️",
-  "Heavy Thunderstorm": "⛈️",
+  "thunderstorm with light rain": "⛈️",
+  "thunderstorm with rain": "⛈️",
+  "thunderstorm with heavy rain": "⛈️",
+  "light thunderstorm": "⛈️",
+  "thunderstorm with light drizzle": "⛈️",
+  "thunderstorm with drizzle": "⛈️",
+  "thunderstorm with heavy drizzle": "⛈️",
+  "heavy thunderstorm": "⛈️",
+  "ragged thunderstorm": "⛈️",
   
   // Snow conditions
   Snow: "❄️",
-  "Light Snow": "🌨️",
-  "Heavy Snow": "❄️",
-  "Sleet": "🌨️",
-  "Hail": "🌨️",
+  "light snow": "🌨️",
+  "heavy snow": "❄️",
+  "sleet": "🌨️",
+  "light shower sleet": "🌨️",
+  "shower sleet": "🌨️",
+  "light rain and snow": "🌨️",
+  "rain and snow": "🌨️",
+  "light shower snow": "🌨️",
+  "shower snow": "❄️",
+  "heavy shower snow": "❄️",
   
   // Atmospheric conditions
   Mist: "🌫️",
   Smoke: "🌫️",
   Haze: "🌫️",
-  Dust: "🌫️",
+  "sand/ dust whirls": "🌪️",
   Fog: "🌫️",
   Sand: "🌪️",
-  Ash: "🌫️",
+  Dust: "🌫️",
+  "volcanic ash": "🌫️",
   Squall: "⛈️",
   Tornado: "🌪️",
   
-  // Special conditions
-  "Sand/Dust Whirls": "🌪️",
-  "Volcanic Ash": "🌫️",
-  "Tropical Storm": "⛈️",
-  "Hurricane": "🌀",
+  // Default fallback
+  default: "☀️"
+};
+
+// Night icon mapping based on icon codes
+const getNightIcon = (iconCode, description) => {
+  if (!iconCode) return "🌙";
   
-  // Night conditions
-  "Clear Night": "🌙",
-  "Partly Cloudy Night": "🌙",
+  // Night icons (when iconCode ends with 'n')
+  if (iconCode.endsWith('n')) {
+    const baseCode = iconCode.slice(0, -1);
+    switch (baseCode) {
+      case '01': return "🌙"; // clear sky night
+      case '02': return "⭐"; // few clouds night
+      case '03': return "☁️"; // scattered clouds night
+      case '04': return "☁️"; // broken clouds night
+      case '09': return "🌧️"; // shower rain night
+      case '10': return "🌧️"; // rain night
+      case '11': return "⛈️"; // thunderstorm night
+      case '13': return "❄️"; // snow night
+      case '50': return "🌫️"; // mist night
+      default: return "🌙";
+    }
+  }
   
-  // Sunrise/Sunset
-  "Sunrise": "🌅",
-  "Sunset": "🌇",
+  // Day icons - use the regular mapping
+  return weatherIconMap[description] || weatherIconMap.default;
+};
+
+// Helper function to render weather icon with dynamic day/night awareness
+const renderWeatherIcon = (weatherData) => {
+  if (!weatherData || !weatherData.weather || !weatherData.weather[0]) {
+    return "☀️";
+  }
+
+  const iconCode = weatherData.weather[0].icon;
+  const description = weatherData.weather[0].description.toLowerCase();
+  const mainCondition = weatherData.weather[0].main;
+  
+  // Get appropriate icon (day/night aware)
+  const emoji = getNightIcon(iconCode, description) || 
+                weatherIconMap[mainCondition] || 
+                weatherIconMap[description] || 
+                weatherIconMap.default;
+
+  return emoji;
 };
 
 const styles = {
@@ -336,7 +383,7 @@ const CurrentLocation = () => {
           </div>
           
           <div style={styles.weatherIcon}>
-            {weatherIconMap[weather.weather[0].main] || "☀️"}
+            {renderWeatherIcon(weather)}
           </div>
           
           <div style={styles.temperature}>

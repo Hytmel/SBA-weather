@@ -1,23 +1,11 @@
 import { useState, useEffect } from "react";
 import "./DashBoard.css";
-import sunCloudy from "../../assets/sun-cloudy.png";
-import Rain from "../../assets/rain.png";
-import PartlySunny from "../../assets/partly-sunny.png";
-import SunWindy from "../../assets/sun-windy.png";
-import ClearSunny from "../../assets/clear-sunny.png";
-import Mist from "../../assets/mist.png";
-import Thunderstorm from "../../assets/thunderstorm.png";
-import Snow from "../../assets/snow.png";
-import Hail from "../../assets/hail.png";
-import CrescentMoon from "../../assets/crescent-moon.png";
-import Sunrise from "../../assets/sunrise.png";
-import Sandstorm from "../../assets/sandstorm.png";
-import Fog from "../../assets/fog.png";
-import Cloudy from "../../assets/cloudy (1).png";
-import Drizzle from "../../assets/drizzle.png";
 import Compass from "../../assets/compass.png";
+import PartlySunny from "../../assets/partly-sunny.png";
+import Rain from "../../assets/rain.png";
 import Drops from "../../assets/drops.png";
 import Ultraviolet from "../../assets/ultraviolet.png";
+import SunWindy from "../../assets/sun-windy.png";
 
 const DashBoard = ({ selectedCity }) => {
   const [weatherData, setWeatherData] = useState(null);
@@ -28,6 +16,98 @@ const DashBoard = ({ selectedCity }) => {
   const [sidiBelAbbesData, setSidiBelAbbesData] = useState(null);
 
   const API_KEY = "dddd398c7652c9c3398a81ee2313e509";
+
+  // Weather icon mapping with night/day conditions
+  const weatherIconMap = {
+    // Clear conditions
+    Clear: "☀️",
+    "clear sky": "☀️",
+    
+    // Cloud conditions
+    Clouds: "☁️",
+    "few clouds": "⛅",
+    "scattered clouds": "🌤️",
+    "broken clouds": "☁️",
+    "overcast clouds": "☁️",
+    
+    // Rain conditions
+    Rain: "🌧️",
+    Drizzle: "🌦️",
+    "light rain": "🌦️",
+    "moderate rain": "🌧️",
+    "heavy intensity rain": "🌧️",
+    "very heavy rain": "🌧️",
+    "extreme rain": "🌧️",
+    "shower rain": "🌧️",
+    "light intensity shower rain": "🌧️",
+    "heavy intensity shower rain": "🌧️",
+    "ragged shower rain": "🌧️",
+    
+    // Storm conditions
+    Thunderstorm: "⛈️",
+    "thunderstorm with light rain": "⛈️",
+    "thunderstorm with rain": "⛈️",
+    "thunderstorm with heavy rain": "⛈️",
+    "light thunderstorm": "⛈️",
+    "thunderstorm with light drizzle": "⛈️",
+    "thunderstorm with drizzle": "⛈️",
+    "thunderstorm with heavy drizzle": "⛈️",
+    "heavy thunderstorm": "⛈️",
+    "ragged thunderstorm": "⛈️",
+    
+    // Snow conditions
+    Snow: "❄️",
+    "light snow": "🌨️",
+    "heavy snow": "❄️",
+    "sleet": "🌨️",
+    "light shower sleet": "🌨️",
+    "shower sleet": "🌨️",
+    "light rain and snow": "🌨️",
+    "rain and snow": "🌨️",
+    "light shower snow": "🌨️",
+    "shower snow": "❄️",
+    "heavy shower snow": "❄️",
+    
+    // Atmospheric conditions
+    Mist: "🌫️",
+    Smoke: "🌫️",
+    Haze: "🌫️",
+    "sand/ dust whirls": "🌪️",
+    Fog: "🌫️",
+    Sand: "🌪️",
+    Dust: "🌫️",
+    "volcanic ash": "🌫️",
+    Squall: "⛈️",
+    Tornado: "🌪️",
+    
+    // Default fallback
+    default: "☀️"
+  };
+
+  // Night icon mapping based on icon codes
+  const getNightIcon = (iconCode, description) => {
+    if (!iconCode) return "🌙";
+    
+    // Night icons (when iconCode ends with 'n')
+    if (iconCode.endsWith('n')) {
+      const baseCode = iconCode.slice(0, -1);
+      switch (baseCode) {
+        case '01': return "🌙"; // clear sky night
+        case '02': return "⭐"; // few clouds night
+        case '03': return "☁️"; // scattered clouds night
+        case '04': return "☁️"; // broken clouds night
+        case '09': return "🌧️"; // shower rain night
+        case '10': return "🌧️"; // rain night
+        case '11': return "⛈️"; // thunderstorm night
+        case '13': return "❄️"; // snow night
+        case '50': return "🌫️"; // mist night
+        default: return "🌙";
+      }
+    }
+    
+    // Day icons - use the regular mapping
+    return weatherIconMap[description] || weatherIconMap.default;
+  };
 
   // List of Algerian cities
   const initialCities = ["Algiers", "Oran", "Constantine", "Annaba"];
@@ -230,68 +310,52 @@ const DashBoard = ({ selectedCity }) => {
 
   const upcomingForecast = getUpcomingForecast();
 
-  // Helper function to get static weather icon using all available pictures
-  const getStaticWeatherIcon = (iconCode) => {
-    if (!iconCode) return sunCloudy;
-    
-    // Comprehensive mapping using all available weather icons
-    const iconMap = {
-      // Clear sky
-      '01d': ClearSunny,     // clear sky day
-      '01n': CrescentMoon,   // clear sky night
-      
-      // Few clouds
-      '02d': PartlySunny,    // few clouds day
-      '02n': PartlySunny,    // few clouds night
-      
-      // Scattered clouds
-      '03d': PartlySunny,    // scattered clouds day
-      '03n': PartlySunny,    // scattered clouds night
-      
-      // Broken clouds
-      '04d': Cloudy,         // broken clouds day
-      '04n': Cloudy,         // broken clouds night
-      
-      // Shower rain
-      '09d': Drizzle,        // shower rain day
-      '09n': Drizzle,        // shower rain night
-      
-      // Rain
-      '10d': Rain,           // rain day
-      '10n': Rain,           // rain night
-      
-      // Thunderstorm
-      '11d': Thunderstorm,   // thunderstorm day
-      '11n': Thunderstorm,   // thunderstorm night
-      
-      // Snow
-      '13d': Snow,           // snow day
-      '13n': Snow,           // snow night
-      
-      // Sleet (freezing rain)
-      '13d': Hail,           // sleet day
-      '13n': Hail,           // sleet night
-      
-      // Mist/Fog
-      '50d': Mist,           // mist day
-      '50n': Fog             // mist night
-    };
-    
-    return iconMap[iconCode] || sunCloudy;
-  };
-
-  // Helper function to render weather icon
-  const renderWeatherIcon = (weatherData) => {
+  // Helper function to render weather icon as emoji with different sizes
+  const renderWeatherIcon = (weatherData, isMainIcon = false) => {
     if (!weatherData || !weatherData.weather || !weatherData.weather[0]) {
-      return null;
+      const defaultSize = isMainIcon ? '72px' : '48px';
+      return (
+        <span 
+          className="weather-icon" 
+          style={{ 
+            fontSize: defaultSize, 
+            display: 'inline-block', 
+            width: defaultSize, 
+            height: defaultSize, 
+            lineHeight: defaultSize,
+            textAlign: 'center'
+          }}
+        >
+          ☀️
+        </span>
+      );
     }
 
+    const iconCode = weatherData.weather[0].icon;
+    const description = weatherData.weather[0].description.toLowerCase();
+    const mainCondition = weatherData.weather[0].main;
+    
+    // Get appropriate icon (day/night aware)
+    const emoji = getNightIcon(iconCode, description) || weatherIconMap[mainCondition] || weatherIconMap[description] || weatherIconMap.default;
+
+    // Make main icon larger
+    const iconSize = isMainIcon ? '72px' : '48px';
+
     return (
-      <img
-        src={getStaticWeatherIcon(weatherData.weather[0].icon)}
-        alt={weatherData.weather[0].description}
-        className="weather-icon"
-      />
+      <span 
+        className="weather-icon" 
+        style={{ 
+          fontSize: iconSize, 
+          display: 'inline-block', 
+          width: iconSize, 
+          height: iconSize, 
+          lineHeight: iconSize,
+          textAlign: 'center'
+        }}
+        title={weatherData.weather[0].description}
+      >
+        {emoji}
+      </span>
     );
   };
 
@@ -304,7 +368,7 @@ const DashBoard = ({ selectedCity }) => {
       <div className="home">
         <div className="feed-1">
           <div className="feeds">
-            {renderWeatherIcon(weatherData)}
+            {renderWeatherIcon(weatherData, true)}
             <div>
               <div>
                 <span>
