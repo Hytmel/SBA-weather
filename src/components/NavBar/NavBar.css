@@ -50,6 +50,21 @@
   color: #409ac0;
 }
 
+.nav-section nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: inherit;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+  transition: 0.5s;
+}
+
+.nav-section nav ul li a:hover {
+  color: #409ac0;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .nav-section {

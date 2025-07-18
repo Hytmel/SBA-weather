@@ -574,3 +574,10 @@
     height: 40px;
   }
 }
+
+@media (min-width: 1240px) {
+  .dashboard-section {
+    margin-left: 190px;
+  }
+}
+

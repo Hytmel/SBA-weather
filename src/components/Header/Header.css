@@ -342,3 +342,9 @@
     display: none;
   }
 }
+
+@media (min-width: 1240px) {
+  .header-section {
+    margin-left: 190px;
+  }
+}

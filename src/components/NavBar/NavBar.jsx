@@ -1,48 +1,41 @@
 import React from "react";
 import "./NavBar.css";
 import logo from "../../assets/logo.png";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <>
-      <section className="nav-section">
-        <nav>
-          <img src={logo}></img>
-          <ul>
-            <li>
+    <section className="nav-section">
+      <nav>
+        <img src={logo} alt="Weather App Logo" />
+        <ul>
+          <li>
+            <Link to="/">
               <ion-icon name="home-outline"></ion-icon>
               <span>Home</span>
-            </li>
-            <li>
-              <ion-icon name="newspaper-outline"></ion-icon>
-              <span>Blogs</span>
-            </li>
-            <li>
-              <ion-icon name="locate-outline"></ion-icon>
+            </Link>
+          </li>
+          <li>
+            <Link to="/map">
+              <ion-icon name="map-outline"></ion-icon>
               <span>Map</span>
-            </li>
-            <li>
-              <ion-icon name="camera-outline"></ion-icon>
-              <span>Photos</span>
-            </li>
-            <li>
-              <ion-icon name="videocam-outline"></ion-icon>
-              <span>Videos</span>
-            </li>
-            <li>
-              <ion-icon name="call-outline"></ion-icon>
-              <span>Phone</span>
-            </li>
-          </ul>
-          <ul>
-            <li>
-              <ion-icon name="log-out-outline"></ion-icon>
-              <span>Log Out</span>
-            </li>
-          </ul>
-        </nav>
-      </section>
-    </>
+            </Link>
+          </li>
+          <li>
+            <Link to="/forecast">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>Forecast</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/current-location">
+              <ion-icon name="locate-outline"></ion-icon>
+              <span>Current Location</span>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </section>
   );
 };
 export default NavBar;
