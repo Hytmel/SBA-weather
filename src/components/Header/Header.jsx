@@ -7,13 +7,25 @@ const Header = ({ onCitySearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentCity, setCurrentCity] = useState("Sidi Bel Abbes");
   const [searchError, setSearchError] = useState("");
+  const [currentDate, setCurrentDate] = useState("");
+  const [shortDate, setShortDate] = useState("");
   const API_KEY = "dddd398c7652c9c3398a81ee2313e509";
   
   useEffect(() => {
-    // Fetch weather data for Sidi Bel Abbes on component mount
     fetchWeatherData("Sidi Bel Abbes");
+    const date = new Date();
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const months = [
+      "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    ];
+    const formattedDate = `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    const shortFormattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    setCurrentDate(formattedDate);
+    setShortDate(shortFormattedDate);
   }, []);
-  
+
+
+
   const fetchWeatherData = async (city) => {
     try {
       setLoading(true);
@@ -21,16 +33,12 @@ const Header = ({ onCitySearch }) => {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city},DZ&appid=${API_KEY}&units=metric`
       );
-
       if (!response.ok) {
         throw new Error("City not found");
       }
-
       const data = await response.json();
       setWeatherData(data);
       setCurrentCity(data.name);
-      
-      // Pass the weather data to parent component
       if (onCitySearch) {
         onCitySearch(data);
       }
@@ -44,7 +52,7 @@ const Header = ({ onCitySearch }) => {
   
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
-    setSearchError(""); // Clear error when user types
+    setSearchError("");
   };
   
   const handleSearch = (e) => {
@@ -62,6 +70,8 @@ const Header = ({ onCitySearch }) => {
       setSearchQuery("");
     }
   };
+
+
 
   return (
     <section className="header-section">
@@ -88,8 +98,10 @@ const Header = ({ onCitySearch }) => {
           <ion-icon name="search-outline"></ion-icon>
         </button>
       </div>
-      <div>
+      <div className="calendar-date">
         <ion-icon name="calendar-outline"></ion-icon>
+        <span className="date-full">{currentDate}</span>
+        <span className="date-short">{shortDate}</span>
         <ion-icon name="notifications-outline"></ion-icon>
       </div>
     </section>

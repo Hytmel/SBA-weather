@@ -158,6 +158,34 @@
   vertical-align: middle;
 }
 
+.calendar-date {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.calendar-date ion-icon {
+  font-size: 1.3rem;
+  color: white;
+}
+
+.calendar-date span {
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.date-short {
+  display: none;
+}
+
+
+
+
+
 
 /* Responsive Design */
 @media (max-width: 1200px) {
@@ -204,6 +232,20 @@
   .header-section div:nth-child(3) {
     font-size: 1.1rem;
   }
+  
+  .calendar-date {
+    font-size: 1rem;
+    gap: 0.4rem;
+  }
+  
+  .calendar-date .date-full {
+    display: none;
+  }
+  
+  .calendar-date .date-short {
+    display: inline;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -239,5 +281,19 @@
   
   .header-section div:nth-child(3) {
     font-size: 1rem;
+  }
+  
+  .calendar-date {
+    font-size: 0.9rem;
+    gap: 0.3rem;
+  }
+  
+  .calendar-date .date-full {
+    display: none;
+  }
+  
+  .calendar-date .date-short {
+    display: inline;
+    font-size: 0.8rem;
   }
 }
