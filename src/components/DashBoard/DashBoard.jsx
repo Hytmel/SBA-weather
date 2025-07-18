@@ -13,7 +13,9 @@ const DashBoard = ({ selectedCity }) => {
   const [otherCitiesData, setOtherCitiesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAllCities, setShowAllCities] = useState(false);
-  const [sidiBelAbbesData, setSidiBelAbbesData] = useState(null);
+  const [userLocationData, setUserLocationData] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationName, setLocationName] = useState("Your Location");
 
   const API_KEY = "dddd398c7652c9c3398a81ee2313e509";
 
@@ -127,8 +129,14 @@ const DashBoard = ({ selectedCity }) => {
   const citiesToDisplay = showAllCities ? allAlgerianCities : initialCities;
 
   useEffect(() => {
-    fetchInitialWeatherData();
+    getCurrentLocation();
   }, []);
+
+  useEffect(() => {
+    if (userLocation) {
+      fetchInitialWeatherData();
+    }
+  }, [userLocation]);
 
   useEffect(() => {
     if (!loading) {
@@ -143,10 +151,50 @@ const DashBoard = ({ selectedCity }) => {
     }
   }, [selectedCity]);
 
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      // Fallback to Sidi Bel Abbes if geolocation is not supported
+      fetchInitialWeatherDataFallback();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lon: longitude });
+        
+        // Get city name from coordinates
+        fetchCityName(latitude, longitude);
+      },
+      (err) => {
+        // Fallback to Sidi Bel Abbes if location access is denied
+        console.log("Location access denied, using fallback");
+        fetchInitialWeatherDataFallback();
+      }
+    );
+  };
+
+  const fetchCityName = async (lat, lon) => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          setLocationName(data[0].name);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching city name:", error);
+    }
+  };
+
   const handleCitySwitch = (newCityData) => {
-    // Store current weather data as Sidi Bel Abbes data if it's not already stored
-    if (weatherData && !sidiBelAbbesData) {
-      setSidiBelAbbesData(weatherData);
+    // Store current weather data as user location data if it's not already stored
+    if (weatherData && !userLocationData) {
+      setUserLocationData(weatherData);
     }
 
     // Set the new city as main weather data
@@ -178,22 +226,59 @@ const DashBoard = ({ selectedCity }) => {
       // Remove the new city from other cities if it exists
       const filteredCities = prevCities.filter(city => city.name !== newCityData.name);
       
-      // Add Sidi Bel Abbes to the list if we have its data and it's not already there
-      if (sidiBelAbbesData && !filteredCities.some(city => city.name === "Sidi Bel Abbes")) {
-        return [sidiBelAbbesData, ...filteredCities];
+      // Add user location to the list if we have its data and it's not already there
+      if (userLocationData && !filteredCities.some(city => city.name === locationName)) {
+        return [userLocationData, ...filteredCities];
       }
       
       return filteredCities;
     });
   };
 
+  const fetchInitialWeatherDataFallback = async () => {
+    setLoading(true);
+    try {
+      // Fallback to Sidi Bel Abbes
+      const [currentWeatherResponse, forecastResponse] = await Promise.all([
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`)
+      ]);
+
+      let currentWeatherData = null;
+      if (currentWeatherResponse.ok) {
+        currentWeatherData = await currentWeatherResponse.json();
+        setWeatherData(currentWeatherData);
+      } else {
+        setWeatherData(null);
+      }
+
+      let forecastDataObj = null;
+      if (forecastResponse.ok) {
+        forecastDataObj = await forecastResponse.json();
+        setForecastData(forecastDataObj);
+      } else {
+        setForecastData(null);
+      }
+
+      setLoading(false);
+      fetchCitiesData();
+    } catch (error) {
+      setWeatherData(null);
+      setForecastData(null);
+      setOtherCitiesData([]);
+      setLoading(false);
+    }
+  };
+
   const fetchInitialWeatherData = async () => {
+    if (!userLocation) return;
+    
     setLoading(true);
     try {
       // Fetch all data in parallel for faster loading
       const [currentWeatherResponse, forecastResponse] = await Promise.all([
-        fetch(`https://api.openweathermap.org/data/2.5/weather?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`),
-        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`)
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${userLocation.lat}&lon=${userLocation.lon}&appid=${API_KEY}&units=metric`),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${userLocation.lat}&lon=${userLocation.lon}&appid=${API_KEY}&units=metric`)
       ]);
 
       // Process current weather data
@@ -373,8 +458,8 @@ const DashBoard = ({ selectedCity }) => {
               <div>
                 <span>
                   {weatherData
-                    ? `${weatherData.name}, Algeria`
-                    : "Sidi Bel Abbes, Algeria"}
+                    ? `${weatherData.name}, ${weatherData.sys?.country || 'Algeria'}`
+                    : `${locationName}, Algeria`}
                 </span>
                 <span>
                   {weatherData
