@@ -4,6 +4,17 @@ import sunCloudy from "../../assets/sun-cloudy.png";
 import Rain from "../../assets/rain.png";
 import PartlySunny from "../../assets/partly-sunny.png";
 import SunWindy from "../../assets/sun-windy.png";
+import ClearSunny from "../../assets/clear-sunny.png";
+import Mist from "../../assets/mist.png";
+import Thunderstorm from "../../assets/thunderstorm.png";
+import Snow from "../../assets/snow.png";
+import Hail from "../../assets/hail.png";
+import CrescentMoon from "../../assets/crescent-moon.png";
+import Sunrise from "../../assets/sunrise.png";
+import Sandstorm from "../../assets/sandstorm.png";
+import Fog from "../../assets/fog.png";
+import Cloudy from "../../assets/cloudy (1).png";
+import Drizzle from "../../assets/drizzle.png";
 import Compass from "../../assets/compass.png";
 import Drops from "../../assets/drops.png";
 import Ultraviolet from "../../assets/ultraviolet.png";
@@ -24,94 +35,48 @@ const DashBoard = () => {
   }, []);
 
   const fetchAllWeatherData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      console.log("🌦️ Starting to fetch weather data...");
-
       // Fetch current weather for Sidi Bel Abbes
-      console.log("📍 Fetching current weather for Sidi Bel Abbes...");
       const currentWeatherResponse = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`
       );
-
-      console.log(
-        "📊 Current weather response status:",
-        currentWeatherResponse.status
-      );
-
+      let currentWeatherData = null;
       if (currentWeatherResponse.ok) {
-        const currentWeatherData = await currentWeatherResponse.json();
-        console.log("✅ Current weather data received:", currentWeatherData);
+        currentWeatherData = await currentWeatherResponse.json();
         setWeatherData(currentWeatherData);
       } else {
-        console.error(
-          "❌ Current weather request failed:",
-          currentWeatherResponse.status,
-          currentWeatherResponse.statusText
-        );
+        setWeatherData(null);
       }
 
       // Fetch 5-day forecast for Sidi Bel Abbes
-      console.log("📅 Fetching 5-day forecast for Sidi Bel Abbes...");
       const forecastResponse = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`
       );
-
-      console.log("📊 Forecast response status:", forecastResponse.status);
-
+      let forecastDataObj = null;
       if (forecastResponse.ok) {
-        const forecastData = await forecastResponse.json();
-        console.log("✅ Forecast data received:", forecastData);
-        console.log("📋 Forecast list length:", forecastData.list.length);
-        setForecastData(forecastData);
+        forecastDataObj = await forecastResponse.json();
+        setForecastData(forecastDataObj);
       } else {
-        console.error(
-          "❌ Forecast request failed:",
-          forecastResponse.status,
-          forecastResponse.statusText
-        );
+        setForecastData(null);
       }
 
       // Fetch weather for other Algerian cities
-      console.log("🏙️ Fetching weather for other cities:", otherCities);
-      const otherCitiesPromises = otherCities.map((city, index) => {
-        console.log(`🌍 Fetching weather for ${city}...`);
-        return fetch(
+      const otherCitiesPromises = otherCities.map((city) =>
+        fetch(
           `https://api.openweathermap.org/data/2.5/weather?q=${city},DZ&appid=${API_KEY}&units=metric`
         )
-          .then((response) => {
-            console.log(`📊 ${city} response status:`, response.status);
-            return response.ok ? response.json() : null;
-          })
-          .then((data) => {
-            if (data) {
-              console.log(`✅ ${city} data received:`, data);
-            } else {
-              console.warn(`⚠️ No data received for ${city}`);
-            }
-            return data;
-          })
-          .catch((error) => {
-            console.error(`❌ Error fetching ${city}:`, error);
-            return null;
-          });
-      });
-
-      const otherCitiesResults = await Promise.all(otherCitiesPromises);
-      const validCitiesData = otherCitiesResults.filter(
-        (data) => data !== null
+          .then((response) => (response.ok ? response.json() : null))
+          .catch(() => null)
       );
-
-      console.log("🏙️ Other cities results:", otherCitiesResults);
-      console.log("✅ Valid cities data:", validCitiesData);
-      console.log("📊 Number of valid cities:", validCitiesData.length);
-
-      setOtherCitiesData(validCitiesData);
+      const otherCitiesResults = await Promise.all(otherCitiesPromises);
+      setOtherCitiesData(otherCitiesResults.filter((data) => data !== null));
     } catch (error) {
-      console.error("💥 Error fetching weather data:", error);
+      setWeatherData(null);
+      setForecastData(null);
+      setOtherCitiesData([]);
     } finally {
       setLoading(false);
-      console.log("🏁 Weather data fetching completed");
     }
   };
 
@@ -131,10 +96,8 @@ const DashBoard = () => {
   };
 
   // Get next few days from forecast
-  // Get next few days from forecast
   const getUpcomingForecast = () => {
     if (!forecastData) {
-      console.log("⚠️ No forecast data available");
       return [null, null];
     }
 
@@ -142,64 +105,113 @@ const DashBoard = () => {
     const upcomingDays = [];
     const usedDates = new Set(); // Track which dates we've already used
 
-    console.log("📅 Current date:", today);
-    console.log("📋 Processing forecast data...");
-
-    for (
-      let i = 0;
-      i < forecastData.list.length && upcomingDays.length < 2;
-      i++
-    ) {
-      const forecastDate = new Date(forecastData.list[i].dt * 1000);
+    // Group forecast data by date and get the noon forecast for each day
+    const dailyForecasts = {};
+    
+    forecastData.list.forEach((forecast) => {
+      const forecastDate = new Date(forecast.dt * 1000);
       const forecastDay = forecastDate.getDate();
-
-      console.log(
-        `📅 Forecast item ${i}: ${forecastDate.toLocaleDateString()}, Date: ${forecastDay}`
-      );
-
-      // Skip if it's today or if we've already used this date
-      if (forecastDay !== today && !usedDates.has(forecastDay)) {
-        console.log(
-          `✅ Adding forecast for ${forecastDate.toLocaleDateString()}`
-        );
-        upcomingDays.push(forecastData.list[i]);
-        usedDates.add(forecastDay); // Mark this date as used
+      const forecastHour = forecastDate.getHours();
+      
+      // Skip today's data
+      if (forecastDay === today) return;
+      
+      // If we haven't seen this date yet, or if this is closer to noon (12:00)
+      if (!dailyForecasts[forecastDay] || Math.abs(forecastHour - 12) < Math.abs(dailyForecasts[forecastDay].hour - 12)) {
+        dailyForecasts[forecastDay] = {
+          ...forecast,
+          hour: forecastHour
+        };
       }
-    }
+    });
 
-    console.log("📊 Upcoming days found:", upcomingDays.length);
-    console.log("🌤️ Upcoming forecast:", upcomingDays);
+    // Convert to array and sort by date
+    const sortedDays = Object.values(dailyForecasts)
+      .sort((a, b) => new Date(a.dt * 1000) - new Date(b.dt * 1000))
+      .slice(0, 2);
 
-    return upcomingDays.length < 2
-      ? [...upcomingDays, null, null].slice(0, 2)
-      : upcomingDays;
+    return sortedDays.length < 2
+      ? [...sortedDays, null, null].slice(0, 2)
+      : sortedDays;
   };
 
   const upcomingForecast = getUpcomingForecast();
 
-  // Log state data when it changes
-  useEffect(() => {
-    console.log("🔄 Weather data state updated:", weatherData);
-  }, [weatherData]);
+  // Helper function to get static weather icon using all available pictures
+  const getStaticWeatherIcon = (iconCode) => {
+    if (!iconCode) return sunCloudy;
+    
+    // Comprehensive mapping using all available weather icons
+    const iconMap = {
+      // Clear sky
+      '01d': ClearSunny,     // clear sky day
+      '01n': CrescentMoon,   // clear sky night
+      
+      // Few clouds
+      '02d': PartlySunny,    // few clouds day
+      '02n': PartlySunny,    // few clouds night
+      
+      // Scattered clouds
+      '03d': PartlySunny,    // scattered clouds day
+      '03n': PartlySunny,    // scattered clouds night
+      
+      // Broken clouds
+      '04d': Cloudy,         // broken clouds day
+      '04n': Cloudy,         // broken clouds night
+      
+      // Shower rain
+      '09d': Drizzle,        // shower rain day
+      '09n': Drizzle,        // shower rain night
+      
+      // Rain
+      '10d': Rain,           // rain day
+      '10n': Rain,           // rain night
+      
+      // Thunderstorm
+      '11d': Thunderstorm,   // thunderstorm day
+      '11n': Thunderstorm,   // thunderstorm night
+      
+      // Snow
+      '13d': Snow,           // snow day
+      '13n': Snow,           // snow night
+      
+      // Sleet (freezing rain)
+      '13d': Hail,           // sleet day
+      '13n': Hail,           // sleet night
+      
+      // Mist/Fog
+      '50d': Mist,           // mist day
+      '50n': Fog             // mist night
+    };
+    
+    return iconMap[iconCode] || sunCloudy;
+  };
 
-  useEffect(() => {
-    console.log("🔄 Forecast data state updated:", forecastData);
-  }, [forecastData]);
+  // Helper function to render weather icon
+  const renderWeatherIcon = (weatherData) => {
+    if (!weatherData || !weatherData.weather || !weatherData.weather[0]) {
+      return null;
+    }
 
-  useEffect(() => {
-    console.log("🔄 Other cities data state updated:", otherCitiesData);
-  }, [otherCitiesData]);
+    return (
+      <img
+        src={getStaticWeatherIcon(weatherData.weather[0].icon)}
+        alt={weatherData.weather[0].description}
+        className="weather-icon"
+      />
+    );
+  };
 
-  useEffect(() => {
-    console.log("🔄 Loading state:", loading);
-  }, [loading]);
+  if (loading) {
+    return null;
+  }
 
   return (
     <section className="dashboard-section">
       <div className="home">
         <div className="feed-1">
           <div className="feeds">
-            <img src={sunCloudy} alt="" />
+            {renderWeatherIcon(weatherData)}
             <div>
               <div>
                 <span>
@@ -224,12 +236,11 @@ const DashBoard = () => {
           <div className="feed">
             <div>
               <div>
-                <img src={PartlySunny} alt="" />
+                {upcomingForecast[0] ? renderWeatherIcon(upcomingForecast[0]) : null}
                 <span>
                   {upcomingForecast[0]
                     ? Math.round(upcomingForecast[0].main.temp)
-                    : "14"}{" "}
-                  <sup>o</sup>
+                    : "14"} <sup>o</sup>
                 </span>
               </div>
               <div>
@@ -247,12 +258,11 @@ const DashBoard = () => {
             </div>
             <div>
               <div>
-                <img src={SunWindy} alt="" />
+                {upcomingForecast[1] ? renderWeatherIcon(upcomingForecast[1]) : null}
                 <span>
                   {upcomingForecast[1]
                     ? Math.round(upcomingForecast[1].main.temp)
-                    : "16"}{" "}
-                  <sup>o</sup>
+                    : "16"} <sup>o</sup>
                 </span>
               </div>
               <div>
@@ -283,14 +293,13 @@ const DashBoard = () => {
               </div>
               <div>
                 <span>
-                  {weatherData ? Math.round(weatherData.main.feels_like) : "7"}{" "}
-                  <sup>o</sup>
+                  {weatherData ? Math.round(weatherData.main.feels_like) : "7"} <sup>o</sup>
                 </span>
               </div>
             </div>
             <div>
               <div>
-                <img src={sunCloudy} alt="" />
+                <img src={PartlySunny} alt="" />
                 <div>
                   <span>Cloud</span>
                   <span>
@@ -322,8 +331,7 @@ const DashBoard = () => {
                 <span>
                   {weatherData && weatherData.rain
                     ? Math.round(weatherData.rain["1h"] || 0)
-                    : "0"}{" "}
-                  <sup>mm</sup>
+                    : "0"} <sup>mm</sup>
                 </span>
               </div>
             </div>
@@ -363,14 +371,13 @@ const DashBoard = () => {
               </div>
               <div>
                 <span>
-                  {weatherData ? weatherData.main.pressure : "1013"}{" "}
-                  <sup>hPa</sup>
+                  {weatherData ? weatherData.main.pressure : "1013"} <sup>hPa</sup>
                 </span>
               </div>
             </div>
             <div>
               <div>
-                <img src={PartlySunny} alt="" />
+                <img src={SunWindy} alt="" />
                 <div>
                   <span>Wind</span>
                   <span>
@@ -386,8 +393,7 @@ const DashBoard = () => {
                 <span>
                   {weatherData
                     ? Math.round(weatherData.wind.speed * 3.6)
-                    : "26"}{" "}
-                  <sup>km/h</sup>
+                    : "26"} <sup>km/h</sup>
                 </span>
               </div>
             </div>
@@ -397,106 +403,28 @@ const DashBoard = () => {
       <div className="cities">
         <h2>Other Cities</h2>
         <div className="all-cities">
-          <div>
-            <div>
-              <img src={sunCloudy} alt="" />
+          {otherCitiesData.map((cityData, idx) => (
+            <div key={cityData.id || idx}>
+              <div>
+                {renderWeatherIcon(cityData)}
+                <div>
+                  <span>{cityData ? cityData.name : "-"}</span>
+                  <span>
+                    {cityData
+                      ? `${cityData.weather[0].description}. High: ${Math.round(
+                          cityData.main.temp_max
+                        )}° Low: ${Math.round(cityData.main.temp_min)}°`
+                      : "-"}
+                  </span>
+                </div>
+              </div>
               <div>
                 <span>
-                  {otherCitiesData[0] ? otherCitiesData[0].name : "Algiers"}
-                </span>
-                <span>
-                  {otherCitiesData[0]
-                    ? `${
-                        otherCitiesData[0].weather[0].description
-                      }. Temp: ${Math.round(otherCitiesData[0].main.temp)}°`
-                    : "Cloudy. High: 11° Low: 18°"}
+                  {cityData ? Math.round(cityData.main.temp) : "-"} <sup>o</sup>
                 </span>
               </div>
             </div>
-            <div>
-              <span>
-                {otherCitiesData[0]
-                  ? Math.round(otherCitiesData[0].main.temp)
-                  : "7"}{" "}
-                <sup>o</sup>
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <img src={Rain} alt="" />
-              <div>
-                <span>
-                  {otherCitiesData[1] ? otherCitiesData[1].name : "Oran"}
-                </span>
-                <span>
-                  {otherCitiesData[1]
-                    ? `${
-                        otherCitiesData[1].weather[0].description
-                      }. Temp: ${Math.round(otherCitiesData[1].main.temp)}°`
-                    : "Rain. High: 8° Low: 12°"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <span>
-                {otherCitiesData[1]
-                  ? Math.round(otherCitiesData[1].main.temp)
-                  : "19"}{" "}
-                <sup>o</sup>
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <img src={Rain} alt="" />
-              <div>
-                <span>
-                  {otherCitiesData[2] ? otherCitiesData[2].name : "Constantine"}
-                </span>
-                <span>
-                  {otherCitiesData[2]
-                    ? `${
-                        otherCitiesData[2].weather[0].description
-                      }. Temp: ${Math.round(otherCitiesData[2].main.temp)}°`
-                    : "Snow. High: 2° Low: 8°"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <span>
-                {otherCitiesData[2]
-                  ? Math.round(otherCitiesData[2].main.temp)
-                  : "22"}{" "}
-                <sup>o</sup>
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <img src={sunCloudy} alt="" />
-              <div>
-                <span>
-                  {otherCitiesData[3] ? otherCitiesData[3].name : "Annaba"}
-                </span>
-                <span>
-                  {otherCitiesData[3]
-                    ? `${
-                        otherCitiesData[3].weather[0].description
-                      }. Temp: ${Math.round(otherCitiesData[3].main.temp)}°`
-                    : "Cloudy. High: 10° Low: 18°"}
-                </span>
-              </div>
-            </div>
-            <div>
-              <span>
-                {otherCitiesData[3]
-                  ? Math.round(otherCitiesData[3].main.temp)
-                  : "20"}{" "}
-                <sup>o</sup>
-              </span>
-            </div>
-          </div>
+          ))}
           <button>
             <span>See More</span>
             <ion-icon name="arrow-forward-outline"></ion-icon>

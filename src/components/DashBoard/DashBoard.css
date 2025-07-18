@@ -39,7 +39,8 @@
 }
 
 .feeds img {
-  width: 120px;
+  width: 80px !important;
+  height: 80px !important;
 }
 
 .feeds > div {
@@ -311,6 +312,7 @@
     left: 20px;
     flex-direction: column;
     gap: 20px;
+    margin-top: 20px;
   }
   
   .dashboard-section .home {
@@ -321,17 +323,33 @@
     width: 100%;
   }
   
+  .feed-1 {
+    padding: 20px 15px;
+  }
+  
   .feeds {
     flex-direction: column;
     text-align: center;
+    gap: 15px;
   }
   
   .feeds img {
-    width: 80px;
+    width: 80px !important;
+    height: 80px !important;
   }
   
   .feeds > div > div:last-child span {
     font-size: 2.2rem;
+  }
+  
+  .feed {
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .feed > div {
+    padding: 15px;
+    min-height: 100px;
   }
   
   .feed > div div:first-child span {
@@ -364,10 +382,15 @@
   .dashboard-section {
     left: 10px;
     max-width: 98vw;
+    margin-top: 20px;
   }
   
   .feed-1 {
-    padding: 20px 15px;
+    padding: 15px 10px;
+  }
+  
+  .feeds {
+    gap: 10px;
   }
   
   .feeds > div > div:first-child span:nth-child(1) {
@@ -380,6 +403,16 @@
   
   .feeds > div > div:last-child span {
     font-size: 1.8rem;
+  }
+  
+  .feed {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .feed > div {
+    padding: 12px;
+    min-height: 80px;
   }
   
   .feed > div div:first-child span {
