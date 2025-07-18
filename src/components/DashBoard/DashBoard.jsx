@@ -19,12 +19,13 @@ import Compass from "../../assets/compass.png";
 import Drops from "../../assets/drops.png";
 import Ultraviolet from "../../assets/ultraviolet.png";
 
-const DashBoard = () => {
+const DashBoard = ({ selectedCity }) => {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
   const [otherCitiesData, setOtherCitiesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAllCities, setShowAllCities] = useState(false);
+  const [sidiBelAbbesData, setSidiBelAbbesData] = useState(null);
 
   const API_KEY = "dddd398c7652c9c3398a81ee2313e509";
 
@@ -54,6 +55,57 @@ const DashBoard = () => {
       fetchCitiesData();
     }
   }, [showAllCities, loading]);
+
+  // Handle city switching when user searches
+  useEffect(() => {
+    if (selectedCity) {
+      handleCitySwitch(selectedCity);
+    }
+  }, [selectedCity]);
+
+  const handleCitySwitch = (newCityData) => {
+    // Store current weather data as Sidi Bel Abbes data if it's not already stored
+    if (weatherData && !sidiBelAbbesData) {
+      setSidiBelAbbesData(weatherData);
+    }
+
+    // Set the new city as main weather data
+    setWeatherData(newCityData);
+
+    // Fetch forecast for the new city
+    fetchForecastForCity(newCityData.name);
+
+    // Update other cities list
+    updateOtherCitiesList(newCityData);
+  };
+
+  const fetchForecastForCity = async (cityName) => {
+    try {
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${cityName},DZ&appid=${API_KEY}&units=metric`
+      );
+      if (forecastResponse.ok) {
+        const forecastDataObj = await forecastResponse.json();
+        setForecastData(forecastDataObj);
+      }
+    } catch (error) {
+      console.error('Error fetching forecast for new city:', error);
+    }
+  };
+
+  const updateOtherCitiesList = (newCityData) => {
+    setOtherCitiesData(prevCities => {
+      // Remove the new city from other cities if it exists
+      const filteredCities = prevCities.filter(city => city.name !== newCityData.name);
+      
+      // Add Sidi Bel Abbes to the list if we have its data and it's not already there
+      if (sidiBelAbbesData && !filteredCities.some(city => city.name === "Sidi Bel Abbes")) {
+        return [sidiBelAbbesData, ...filteredCities];
+      }
+      
+      return filteredCities;
+    });
+  };
 
   const fetchInitialWeatherData = async () => {
     setLoading(true);
