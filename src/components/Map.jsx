@@ -141,7 +141,9 @@ const styles = {
     borderRadius: '8px',
     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
     padding: '16px',
-    marginLeft: '100px'
+    marginLeft: '100px',
+    marginBottom:'10px',
+    
   },
   mapHeader: {
     display: 'flex',
