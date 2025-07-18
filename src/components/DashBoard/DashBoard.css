@@ -299,7 +299,8 @@
 @media (max-width: 1200px) {
   .dashboard-section {
     max-width: 90vw;
-    left: 50px;
+    left: 20px;
+    right: 20px;
   }
   
   .feed-1 {
@@ -320,6 +321,7 @@
     width: 100%;
     height: auto;
     flex-direction: column;
+    
     gap: 15px;
   }
   
@@ -485,6 +487,7 @@
   .dashboard-section {
     max-width: 98vw;
     left: 20px;
+    right: 20px;
     flex-direction: column;
     gap: 30px;
     min-width: 0;
@@ -500,7 +503,7 @@
   .feed-1 {
     flex-direction: column;
     height: auto;
-    gap: 30px;
+    gap: 40px;
     padding: 30px 30px;
   }
   .feeds {
@@ -514,16 +517,17 @@
     height: 120px !important;
   }
   .feeds > div > div:last-child span {
-    font-size: 2.8rem;
+    font-size: 3rem;
   }
   .feed {
     width: 100%;
     flex-direction: row;
-    gap: 30px;
+    gap: 20px;
   }
   .feed > div {
     padding: 30px;
     min-height: 120px;
+    min-width: 500px;
   }
   .feed > div div:first-child span {
     font-size: 2.5rem;
