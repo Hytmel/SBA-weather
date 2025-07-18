@@ -480,3 +480,80 @@
     font-size: 1.4rem;
   }
 }
+
+@media (max-width: 1240px) and (min-width: 781px) {
+  .dashboard-section {
+    max-width: 98vw;
+    left: 20px;
+    flex-direction: column;
+    gap: 30px;
+    min-width: 0;
+    padding: 0 30px;
+    margin-top: 30px;
+  }
+  .dashboard-section .home {
+    width: 100%;
+  }
+  .cities {
+    width: 100%;
+  }
+  .feed-1 {
+    flex-direction: column;
+    height: auto;
+    gap: 30px;
+    padding: 30px 30px;
+  }
+  .feeds {
+    width: 100%;
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+  .feeds img {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  .feeds > div > div:last-child span {
+    font-size: 2.8rem;
+  }
+  .feed {
+    width: 100%;
+    flex-direction: row;
+    gap: 30px;
+  }
+  .feed > div {
+    padding: 30px;
+    min-height: 120px;
+  }
+  .feed > div div:first-child span {
+    font-size: 2.5rem;
+  }
+  .all-highlights {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  .all-highlights > div {
+    padding: 24px;
+  }
+  .all-highlights > div > div:first-child img {
+    width: 120px;
+  }
+  .all-highlights > div > div:first-child span:first-child {
+    font-size: 1.5rem;
+  }
+  .all-highlights > div > div:last-child span {
+    font-size: 2rem;
+  }
+  .all-cities > div {
+    padding: 24px;
+  }
+  .all-cities > div > div:first-child img {
+    width: 120px;
+  }
+  .all-cities > div > div:first-child span:first-child {
+    font-size: 1.5rem;
+  }
+  .all-cities > div > div:last-child span {
+    font-size: 2rem;
+  }
+}
