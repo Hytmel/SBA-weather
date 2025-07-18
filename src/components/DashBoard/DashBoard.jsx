@@ -24,23 +24,47 @@ const DashBoard = () => {
   const [forecastData, setForecastData] = useState(null);
   const [otherCitiesData, setOtherCitiesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAllCities, setShowAllCities] = useState(false);
 
   const API_KEY = "dddd398c7652c9c3398a81ee2313e509";
 
-  // List of other Algerian cities to display
-  const otherCities = ["Algiers", "Oran", "Constantine", "Annaba"];
+  // List of Algerian cities
+  const initialCities = ["Algiers", "Oran", "Constantine", "Annaba"];
+  const allAlgerianCities = [
+    "Algiers", "Oran", "Constantine", "Annaba", "Batna", "Blida", 
+    "Setif", "Tlemcen", "Ghardaia", "Mostaganem", "Bejaia", "Tebessa",
+    "Tiaret", "El Oued", "Biskra", "Djelfa", "Souk Ahras", "Mascara",
+    "Relizane", "Tamanrasset", "Ouargla", "Guelma", "Chlef", "Laghouat",
+    "Jijel", "Mila", "Bouira", "Tizi Ouzou", "Tipaza", "Ain Defla",
+    "Ain Temouchent", "Adrar", "Bechar", "Bordj Bou Arreridj", "Boumerdes",
+    "El Bayadh", "El Tarf", "Illizi", "Khenchela", "M'Sila", "Naama",
+    "Oum El Bouaghi", "Saida", "Sidi Bel Abbes", "Skikda", "Tindouf",
+    "Tissemsilt", "Tizi Ouzou", "Tlemcen", "Touggourt", "Zeralda"
+  ];
+
+  // Show initial 4 cities or all cities based on state
+  const citiesToDisplay = showAllCities ? allAlgerianCities : initialCities;
 
   useEffect(() => {
-    fetchAllWeatherData();
+    fetchInitialWeatherData();
   }, []);
 
-  const fetchAllWeatherData = async () => {
+  useEffect(() => {
+    if (!loading) {
+      fetchCitiesData();
+    }
+  }, [showAllCities, loading]);
+
+  const fetchInitialWeatherData = async () => {
     setLoading(true);
     try {
-      // Fetch current weather for Sidi Bel Abbes
-      const currentWeatherResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`
-      );
+      // Fetch all data in parallel for faster loading
+      const [currentWeatherResponse, forecastResponse] = await Promise.all([
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`)
+      ]);
+
+      // Process current weather data
       let currentWeatherData = null;
       if (currentWeatherResponse.ok) {
         currentWeatherData = await currentWeatherResponse.json();
@@ -49,10 +73,7 @@ const DashBoard = () => {
         setWeatherData(null);
       }
 
-      // Fetch 5-day forecast for Sidi Bel Abbes
-      const forecastResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=Sidi Bel Abbes,DZ&appid=${API_KEY}&units=metric`
-      );
+      // Process forecast data
       let forecastDataObj = null;
       if (forecastResponse.ok) {
         forecastDataObj = await forecastResponse.json();
@@ -61,23 +82,43 @@ const DashBoard = () => {
         setForecastData(null);
       }
 
-      // Fetch weather for other Algerian cities
-      const otherCitiesPromises = otherCities.map((city) =>
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city},DZ&appid=${API_KEY}&units=metric`
-        )
-          .then((response) => (response.ok ? response.json() : null))
-          .catch(() => null)
-      );
-      const otherCitiesResults = await Promise.all(otherCitiesPromises);
-      setOtherCitiesData(otherCitiesResults.filter((data) => data !== null));
+      // Set loading to false immediately after main data is loaded
+      setLoading(false);
+
+      // Fetch cities data in the background (don't wait for it)
+      fetchCitiesData();
     } catch (error) {
       setWeatherData(null);
       setForecastData(null);
       setOtherCitiesData([]);
-    } finally {
       setLoading(false);
     }
+  };
+
+  const fetchCitiesData = async () => {
+    try {
+      // Fetch weather for other Algerian cities with timeout for faster loading
+      const otherCitiesPromises = citiesToDisplay.map((city) =>
+        Promise.race([
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city},DZ&appid=${API_KEY}&units=metric`
+          )
+            .then((response) => (response.ok ? response.json() : null))
+            .catch(() => null),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+          )
+        ]).catch(() => null)
+      );
+      const otherCitiesResults = await Promise.all(otherCitiesPromises);
+      setOtherCitiesData(otherCitiesResults.filter((data) => data !== null));
+    } catch (error) {
+      setOtherCitiesData([]);
+    }
+  };
+
+  const handleSeeMore = () => {
+    setShowAllCities(!showAllCities);
   };
 
   // Helper function to get day name
@@ -402,7 +443,7 @@ const DashBoard = () => {
       </div>
       <div className="cities">
         <h2>Other Cities</h2>
-        <div className="all-cities">
+        <div className={`all-cities ${showAllCities ? 'scrollable' : ''}`}>
           {otherCitiesData.map((cityData, idx) => (
             <div key={cityData.id || idx}>
               <div>
@@ -425,9 +466,9 @@ const DashBoard = () => {
               </div>
             </div>
           ))}
-          <button>
-            <span>See More</span>
-            <ion-icon name="arrow-forward-outline"></ion-icon>
+          <button onClick={handleSeeMore}>
+            <span>{showAllCities ? "See Less" : "See More"}</span>
+            <ion-icon name={showAllCities ? "arrow-up-outline" : "arrow-forward-outline"}></ion-icon>
           </button>
         </div>
       </div>

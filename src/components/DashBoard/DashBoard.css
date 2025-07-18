@@ -201,6 +201,30 @@
 .all-cities {
   margin-top: 20px;
 }
+
+.all-cities.scrollable {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.all-cities::-webkit-scrollbar {
+  width: 6px;
+}
+
+.all-cities::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.all-cities::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.all-cities::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
 .all-cities > div {
   background: #fff;
   color: black;
