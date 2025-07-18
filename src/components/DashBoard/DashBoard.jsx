@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
 import "./DashBoard.css";
-import Compass from "../../assets/compass.png";
-import PartlySunny from "../../assets/partly-sunny.png";
-import Rain from "../../assets/rain.png";
-import Drops from "../../assets/drops.png";
-import Ultraviolet from "../../assets/ultraviolet.png";
-import SunWindy from "../../assets/sun-windy.png";
 
 const DashBoard = ({ selectedCity }) => {
   const [weatherData, setWeatherData] = useState(null);
@@ -444,6 +438,16 @@ const DashBoard = ({ selectedCity }) => {
     );
   };
 
+  // Highlight icons mapping
+  const highlightIcons = {
+    feelsLike: "🌡️",
+    cloud: "☁️",
+    rain: "🌧️",
+    humidity: "💧",
+    pressure: "📊",
+    wind: "💨"
+  };
+
   if (loading) {
     return null;
   }
@@ -527,7 +531,7 @@ const DashBoard = ({ selectedCity }) => {
           <div className="all-highlights">
             <div>
               <div>
-                <img src={Compass} alt="" />
+                <span className="highlight-icon">{highlightIcons.feelsLike}</span>
                 <div>
                   <span>Feel Like</span>
                   <span>Normal</span>
@@ -541,7 +545,7 @@ const DashBoard = ({ selectedCity }) => {
             </div>
             <div>
               <div>
-                <img src={PartlySunny} alt="" />
+                <span className="highlight-icon">{highlightIcons.cloud}</span>
                 <div>
                   <span>Cloud</span>
                   <span>
@@ -561,7 +565,7 @@ const DashBoard = ({ selectedCity }) => {
             </div>
             <div>
               <div>
-                <img src={Rain} alt="" />
+                <span className="highlight-icon">{highlightIcons.rain}</span>
                 <div>
                   <span>Rain</span>
                   <span>
@@ -579,7 +583,7 @@ const DashBoard = ({ selectedCity }) => {
             </div>
             <div>
               <div>
-                <img src={Drops} alt="" />
+                <span className="highlight-icon">{highlightIcons.humidity}</span>
                 <div>
                   <span>Humidity</span>
                   <span>
@@ -599,7 +603,7 @@ const DashBoard = ({ selectedCity }) => {
             </div>
             <div>
               <div>
-                <img src={Ultraviolet} alt="" />
+                <span className="highlight-icon">{highlightIcons.pressure}</span>
                 <div>
                   <span>Pressure</span>
                   <span>
@@ -619,7 +623,7 @@ const DashBoard = ({ selectedCity }) => {
             </div>
             <div>
               <div>
-                <img src={SunWindy} alt="" />
+                <span className="highlight-icon">{highlightIcons.wind}</span>
                 <div>
                   <span>Wind</span>
                   <span>

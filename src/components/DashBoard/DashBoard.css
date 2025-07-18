@@ -152,6 +152,16 @@
 .all-highlights > div > div:first-child img {
   width: 50px;
 }
+
+.all-highlights > div > div:first-child .highlight-icon {
+  font-size: 3rem !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
 .all-highlights > div > div:first-child span {
   display: block;
   color: black;
