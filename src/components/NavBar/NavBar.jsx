@@ -7,7 +7,17 @@ const NavBar = () => {
   return (
     <section className="nav-section">
       <nav>
-        <img src={logo} alt="Weather App Logo" />
+        <ion-icon 
+          name="partly-sunny-outline" 
+          style={{ 
+            fontSize: '7rem', 
+            color: '#409ac7', 
+            margin: '2rem 0', 
+            display: 'block', 
+            textAlign: 'center', 
+            width: '100%' 
+          }}
+        ></ion-icon>
         <ul>
           <li>
             <Link to="/">

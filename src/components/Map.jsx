@@ -350,8 +350,8 @@ const WeatherMap = () => {
           <div style={styles.mapInner}>
             <MapContainer
               center={algeriaCenter}
-              zoom={6}
-              style={{ height: '500px', width: '100%' }}
+              zoom={4}
+              style={{ height: '350px', width: '100%' }}
               scrollWheelZoom={true}
             >
               <TileLayer

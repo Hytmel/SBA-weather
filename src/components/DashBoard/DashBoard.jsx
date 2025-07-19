@@ -449,7 +449,22 @@ const DashBoard = ({ selectedCity }) => {
   };
 
   if (loading) {
-    return null;
+    return (
+      <section className="dashboard-section" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="spinner" style={{
+            width: '3rem',
+            height: '3rem',
+            border: '4px solid #e3e3e3',
+            borderTop: '4px solid #409ac7',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }} />
+          <div style={{ color: '#409ac7', fontWeight: 500, fontSize: '1.1rem' }}>Loading weather data...</div>
+        </div>
+      </section>
+    );
   }
 
   return (
